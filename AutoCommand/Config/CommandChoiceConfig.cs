@@ -1,6 +1,6 @@
 namespace AutoCommand.Config;
 
-public class CommandChoiceConfig
+internal class CommandChoiceConfig
 {
     public string? Name { get; set; }
     public string? Value { get; set; }

@@ -4,7 +4,7 @@ using static AutoCommand.Utils.EnumParser;
 
 namespace AutoCommand.Config;
 
-public class CommandConfig
+internal class CommandConfig
 {
     public string? Name { get; set; }
     public string? Description { get; set; }

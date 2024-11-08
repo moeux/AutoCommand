@@ -3,7 +3,7 @@ using static AutoCommand.Utils.EnumParser;
 
 namespace AutoCommand.Config;
 
-public class CommandOptionConfig
+internal class CommandOptionConfig
 {
     public string? Name { get; set; }
     public string? Description { get; set; }
