@@ -7,13 +7,21 @@ using Serilog.Sinks.SystemConsole.Themes;
 
 namespace AutoCommand.Utils;
 
+/// <summary>
+///     Provides extension methods for <see cref="IDiscordClient" />
+/// </summary>
 public static class DiscordClientExtensions
 {
     private static readonly Logger Logger = new LoggerConfiguration()
         .WriteTo.Console(theme: AnsiConsoleTheme.Literate)
         .CreateLogger();
 
-    public static async Task CreateSlashCommands(this IDiscordClient client, string commandPath)
+    /// <summary>
+    ///     Creates slash commands found under the specified path
+    /// </summary>
+    /// <param name="client">The client to create commands with</param>
+    /// <param name="commandPath">Directory path to slash command files</param>
+    public static async Task CreateSlashCommandsAsync(this IDiscordClient client, string commandPath)
     {
         var path = Path.GetFullPath(commandPath);
         var directoryInfo = new DirectoryInfo(path);
