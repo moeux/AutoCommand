@@ -43,6 +43,10 @@ public sealed class DefaultCommandRouter
     {
         var loggerConfiguration = new LoggerConfiguration()
             .Destructure.ByTransforming<SocketSlashCommand>(command => new { command.Id, command.CommandName })
+            .Destructure.ByTransformingWhere<dynamic>(type => typeof(SocketUser).IsAssignableFrom(type),
+                user => new { user.Id, user.Username })
+            .Destructure.ByTransforming<SocketRole>(role => new
+                { role.Id, role.Name, role.Position, Permissions = role.Permissions.RawValue })
             .Enrich.FromLogContext()
             .WriteTo.Console(
                 theme: AnsiConsoleTheme.Literate,
