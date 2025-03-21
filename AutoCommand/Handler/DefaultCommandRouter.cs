@@ -39,7 +39,7 @@ public sealed class DefaultCommandRouter
         _logger = logger ?? CreateLogger(logPath);
     }
 
-    private static ILogger CreateLogger(string? logPath = default)
+    private static ILogger CreateLogger(string? logPath = null)
     {
         var loggerConfiguration = new LoggerConfiguration()
             .Destructure.ByTransforming<SocketSlashCommand>(command => new { command.Id, command.CommandName })
@@ -53,7 +53,7 @@ public sealed class DefaultCommandRouter
                 outputTemplate:
                 "[{Timestamp:HH:mm:ss} {Level:u3}] {Properties:j}{NewLine}{Message:lj}{NewLine}{Exception}");
 
-        if (!string.IsNullOrEmpty(logPath))
+        if (!string.IsNullOrWhiteSpace(logPath))
             loggerConfiguration
                 .WriteTo.File(
                     logPath,
@@ -107,8 +107,9 @@ public sealed class DefaultCommandRouter
     ///     Routes the command to the appropriate <see cref="ICommandHandler" />, if any has been registered prior
     /// </summary>
     /// <param name="command">The command to be routed</param>
+    /// <param name="cancellationToken">The cancellation token to cancel command handling</param>
     /// <remarks>If no <see cref="ICommandHandler" /> has been registered prior, this method will do nothing</remarks>
-    public async Task HandleAsync(SocketSlashCommand command)
+    public async Task HandleAsync(SocketSlashCommand command, CancellationToken cancellationToken = default)
     {
         var logger = _logger.ForContext("Token", command.Token);
 
@@ -116,7 +117,7 @@ public sealed class DefaultCommandRouter
         {
             logger.Information("Handling command {@Command} with handler {@Handler}", command, handler);
 
-            await handler.HandleAsync(logger, command);
+            await handler.HandleAsync(logger, command, cancellationToken);
         }
         else
         {

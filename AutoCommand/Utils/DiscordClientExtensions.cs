@@ -21,7 +21,9 @@ public static class DiscordClientExtensions
     /// </summary>
     /// <param name="client">The client to create commands with</param>
     /// <param name="commandPath">Directory path to slash command files</param>
-    public static async Task CreateSlashCommandsAsync(this IDiscordClient client, string commandPath)
+    /// <param name="cancellationToken">The cancellation token to cancel slash command creation</param>
+    public static async Task CreateSlashCommandsAsync(
+        this IDiscordClient client, string commandPath, CancellationToken cancellationToken = default)
     {
         var path = Path.GetFullPath(commandPath);
         var directoryInfo = new DirectoryInfo(path);
@@ -32,11 +34,13 @@ public static class DiscordClientExtensions
             return;
         }
 
-        var existingCommands = await client.GetGlobalApplicationCommandsAsync();
-        var commandDeserializationTasks = directoryInfo.GetFiles().Select(async file =>
+        var existingCommands =
+            await client.GetGlobalApplicationCommandsAsync(
+                options: new RequestOptions { CancelToken = cancellationToken });
+        var commandDeserializationTasks = directoryInfo.GetFiles("*.json").Select(async file =>
         {
             using var reader = file.OpenText();
-            var content = await reader.ReadToEndAsync();
+            var content = await reader.ReadToEndAsync(cancellationToken);
             return JsonConvert.DeserializeObject<CommandConfig>(content);
         });
         var commandConfigs = await Task.WhenAll(commandDeserializationTasks);
@@ -51,10 +55,16 @@ public static class DiscordClientExtensions
                 var command = commandConfig!.ToSlashCommand();
 
                 if (!commandConfig.IsGuildCommand)
-                    return client.CreateGlobalApplicationCommand(command);
+                    return client.CreateGlobalApplicationCommand(
+                        command,
+                        new RequestOptions { CancelToken = cancellationToken });
 
-                var guild = await client.GetGuildAsync(commandConfig.GuildId.GetValueOrDefault());
-                return guild.CreateApplicationCommandAsync(command);
+                var guild = await client.GetGuildAsync(
+                    commandConfig.GuildId.GetValueOrDefault(),
+                    options: new RequestOptions { CancelToken = cancellationToken });
+                return guild.CreateApplicationCommandAsync(
+                    command,
+                    new RequestOptions { CancelToken = cancellationToken });
             });
         var commands = await Task.WhenAll(commandCreationTasks);
         var skipped = commandConfigs.Length - commands.Length;

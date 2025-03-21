@@ -7,5 +7,5 @@ public interface ICommandHandler
 {
     public string CommandName { get; }
 
-    public Task HandleAsync(ILogger logger, SocketSlashCommand command);
+    public Task HandleAsync(ILogger logger, SocketSlashCommand command, CancellationToken cancellationToken = default);
 }
