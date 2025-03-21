@@ -4,7 +4,11 @@
         <TargetFramework>net9.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <PackageId>AutoCommand</PackageId>
         <Version>1.0.2</Version>
+        <Authors>moeux</Authors>
+        <PackageDescription>Discord.Net library to automatically create slash commands from JSON files and slash comand routing. </PackageDescription>
+        <RepositoryUrl>https://github.com/moeux/AutoCommand</RepositoryUrl>
     </PropertyGroup>
 
     <ItemGroup>
